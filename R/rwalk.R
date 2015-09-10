@@ -1,13 +1,13 @@
 # simulation of observations at one location
 library(igraph)
 
-n_nodes <- sample(5:10, 1)
+n_nodes <- sample(5:20, 1)
 Anet <- sample_pa(n_nodes, directed=FALSE)
 plot(Anet)
-A <- as.matrix(as_adj(Anet))
-s <- colSums(A)
+Atrue <- as.matrix(as_adj(Anet))
+s <- colSums(Atrue)
 # maximum number of observations
-zmax <- 100
+zmax <- 1000
 b <- rep(NA, zmax)
 timesteps <- rep(NA, zmax)
 clus <- rep(NA, zmax)
@@ -24,12 +24,12 @@ clus[1] <- 1
 # generate observations
 while(z < zmax){
   # how many steps in the random walk
-  nsteps <- rpois(1, 20)
+  nsteps <- rpois(1, 15)
   focal_node <- b[z]
   while(nsteps > 0){
     if (b[z] == focal_node){
       # probabilities of walking to each node
-      p <- A[b[z], ] / s[b[z]]
+      p <- Atrue[b[z], ] / s[b[z]]
       visit <- sample(n_nodes, 1, prob=p)
       z <- z + 1
       timesteps[z] <- timesteps[z - 1] + 1
@@ -37,9 +37,9 @@ while(z < zmax){
       clus[z] <- clus[z - 1]
       b[z] <- visit
     } else { # the RW is in a neighbor of the focal node
-      stopifnot(b[z] %in% which(A[focal_node, ] > 0))
+      stopifnot(b[z] %in% which(Atrue[focal_node, ] > 0))
       # define common neighbors
-      Ac <- A[focal_node, ] * A[b[z], ]
+      Ac <- Atrue[focal_node, ] * Atrue[b[z], ]
       if (sum(Ac) == 0){
         visit <- focal_node
       } else { 
@@ -55,7 +55,7 @@ while(z < zmax){
   }
   if (z < zmax){
     z <- z + 1
-    timesteps[z] <- timesteps[z - 1] + rpois(1, 20)
+    timesteps[z] <- timesteps[z - 1] + rpois(1, 200)
     clus[z] <- clus[z - 1] + 1
     b[z] <- sample(n_nodes, 1)
   }
