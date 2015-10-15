@@ -2,7 +2,8 @@
 source('R/rwalk.R')
 library(scales)
 library(mclust)
-mod <- Mclust(timesteps, G=1:100, modelName='V')
+mod <- Mclust(timesteps, G=1:20, modelName='V')
+par(mfrow=c(2, 2))
 plot(mod)
 1
 2
@@ -35,25 +36,9 @@ diag(A) <- 0
 # visualize graph
 gA <- graph_from_adjacency_matrix(A, mode='undirected')
 par(mfrow=c(2, 2))
-par(mar=c(2, 1, .5, .5))
-plot(gA, edge.color=alpha('black', .5))
+par(mar=c(2, 1, 1, .5))
+plot(gA, edge.color=alpha('black', .4), main='Estimated network')
 plot(Anet)
-image(A, col=gray.colors(12))
-image(Atrue, col=gray.colors(12))
+image(A, col=gray.colors(12), yaxt='n', xaxt='n')
+image(Atrue, col=gray.colors(12), yaxt='n', xaxt='n')
 par(mar=c(5, 4, 4, 2) + 0.1)
-
-# tainted timesteps
-source('R/rwalk.R')
-
-library(mclust)
-mod2 <- Mclust(timesteps + rnorm(length(timesteps), 0, 2), 
-               G=1:40, modelName='V')
-plot(mod2)
-1
-2
-3
-4
-0
-mod2
-max(clus)
-
